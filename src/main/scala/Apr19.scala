@@ -30,7 +30,16 @@ object Apr19 {
 
   def eval3(ex: Expr): Future[Int] = ex match {
     case Lit(x) => Future(x)
-    case Add(x, y) => eval3(x) + eval3(y)
-    case Multiply(x, y) => eval3(x) * eval3(y)
+    case Add(x, y) => 
+      eval3(x).flatMap(valX =>
+        eval3(y).map(valY =>
+          valX + valY
+        )
+      )
+    case Multiply(x, y) =>
+      for {
+        valX <- eval3(x)
+        valY <- eval3(y)
+      } yield valX * valY
   }
 }
